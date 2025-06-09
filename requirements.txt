@@ -1,3 +1,11 @@
 fastapi
 uvicorn
 requests
+qdrant-client
+openai
+tiktoken
+google-generativeai
+transformers
+torch
+sentence-transformers
+python-dotenv
