@@ -1,6 +1,3 @@
-"""
-Text chunking module for splitting scraped content into manageable pieces.
-"""
 import re
 from typing import List, Dict, Any, Optional
 import tiktoken
@@ -28,7 +25,6 @@ class TextChunker:
         self.chunk_overlap = chunk_overlap
         self._tokenizer = None
         self._strategy = None
-        # This will call the setter method which initializes tokenizer if needed
         self.strategy = strategy
         
     @property
@@ -46,7 +42,6 @@ class TextChunker:
         """
         self._strategy = value
         
-        # Initialize tokenizer for token counting if needed
         if value == 'token':
             self._tokenizer = tiktoken.get_encoding("cl100k_base")
             
@@ -78,7 +73,6 @@ class TextChunker:
             
         chunks = []
         
-        # Normalize strategy to lowercase and handle potential string input issues
         strategy = str(self.strategy).lower().strip()
         
         if strategy == 'paragraph':
@@ -88,11 +82,9 @@ class TextChunker:
         elif strategy == 'token':
             text_chunks = self._chunk_by_token(text)
         else:
-            # Default to paragraph if strategy is invalid
             print(f"Warning: Unknown chunking strategy: '{self.strategy}'. Using 'paragraph' instead.")
             text_chunks = self._chunk_by_paragraph(text)
         
-        # Create chunk objects with metadata
         base_metadata = metadata or {}
         for i, chunk_text in enumerate(text_chunks):
             chunk = {
@@ -121,25 +113,20 @@ class TextChunker:
         
         i = 0
         while i < len(tokens):
-            # Take a chunk of max_chunk_size
             chunk_end = min(i + self.max_chunk_size, len(tokens))
             chunk_tokens = tokens[i:chunk_end]
             chunks.append(self.tokenizer.decode(chunk_tokens))
-            
-            # Move forward by max_chunk_size - chunk_overlap
             i += self.max_chunk_size - self.chunk_overlap
             
         return chunks
     
     def _combine_chunks(self, elements: List[str]) -> List[str]:
-        """Combine elements into chunks respecting max_chunk_size."""
         if self.strategy == 'token':
             return self._combine_chunks_by_tokens(elements)
         else:
             return self._combine_chunks_by_chars(elements)
     
     def _combine_chunks_by_chars(self, elements: List[str]) -> List[str]:
-        """Combine elements into chunks based on character count."""
         chunks = []
         current_chunk = []
         current_size = 0
@@ -162,7 +149,6 @@ class TextChunker:
         return chunks
     
     def _combine_chunks_by_tokens(self, elements: List[str]) -> List[str]:
-        """Combine elements into chunks based on token count."""
         chunks = []
         current_chunk = []
         current_size = 0

@@ -11,7 +11,6 @@ class FirecrawlProvider:
         """
         print(f"Mock scraping {url}...")
         
-        # Return mock data for testing with Qdrant
         if "wikipedia" in url and "artificial_intelligence" in url:
             return [{
                 "url": url,

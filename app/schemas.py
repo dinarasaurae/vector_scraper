@@ -1,7 +1,6 @@
 from pydantic import BaseModel, HttpUrl, Field, validator
 from typing import List, Optional, Dict, Any
 
-# Original scraping schemas
 class ScrapeRequest(BaseModel):
     url: HttpUrl
     depth: int = 1
@@ -16,7 +15,6 @@ class ScrapeResponse(BaseModel):
     status: str
     data: List[PageData]
 
-# Knowledge base processing schemas
 class ProcessWebsiteRequest(BaseModel):
     url: HttpUrl
     depth: int = 1
@@ -37,7 +35,6 @@ class ProcessWebsiteResponse(BaseModel):
     status: str
     data: Dict[str, Any]
 
-# Knowledge base search schemas
 class SearchRequest(BaseModel):
     query: str
     limit: int = 5

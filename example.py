@@ -16,20 +16,17 @@ def main():
     process_parser.add_argument("--parse-js", action="store_true", help="Parse JavaScript")
     process_parser.add_argument("--chunking", choices=["paragraph", "sentence", "token"], 
                                help="Chunking strategy")
-    
-    # Search command
+
     search_parser = subparsers.add_parser("search", help="Search the knowledge base")
     search_parser.add_argument("query", help="Search query")
     search_parser.add_argument("--limit", type=int, default=5, help="Max results")
     search_parser.add_argument("--url-filter", help="Filter by URL")
     
-    # Delete command
     delete_parser = subparsers.add_parser("delete", help="Delete website data")
     delete_parser.add_argument("url", help="Website URL to delete")
     
     args = parser.parse_args()
     
-    # Initialize knowledge base
     kb = KnowledgeBase()
     
     if args.command == "process":

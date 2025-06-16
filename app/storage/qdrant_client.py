@@ -1,6 +1,3 @@
-"""
-Qdrant vector database integration for storing and searching embeddings.
-"""
 from typing import List, Dict, Any, Optional, Union
 import uuid
 
@@ -33,7 +30,7 @@ class QdrantStorage:
         port: int = QDRANT_PORT,
         collection_name: str = QDRANT_COLLECTION_NAME,
         api_key: Optional[str] = QDRANT_API_KEY,
-        vector_size: int = 768  # Gemini and HuggingFace models typically use 768 dimensions
+        vector_size: int = 768  # Gemini, у openai вроде другое
     ):
         """
         Initialize Qdrant storage.
@@ -51,7 +48,6 @@ class QdrantStorage:
         self.api_key = api_key
         self.vector_size = vector_size
         
-        # Initialize client connection
         client_kwargs = {
             "url": url, 
             "port": port if url == "localhost" else None
@@ -61,8 +57,6 @@ class QdrantStorage:
             client_kwargs["api_key"] = api_key
             
         self.client = QdrantClient(**client_kwargs)
-        
-        # Ensure collection exists
         self._create_collection_if_not_exists()
     
     def _create_collection_if_not_exists(self):
@@ -76,7 +70,6 @@ class QdrantStorage:
                 vectors_config=VectorParams(size=self.vector_size, distance=Distance.COSINE)
             )
             
-            # Create a payload index for filtering by source URL
             self.client.create_payload_index(
                 collection_name=self.collection_name,
                 field_name="url",
@@ -101,14 +94,12 @@ class QdrantStorage:
         point_ids = []
         
         for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
-            # Generate a numeric ID for this point
-            point_id = i + 1  # Simple numeric ID starting from 1
-            point_ids.append(str(point_id))  # Return as string for backward compatibility
+            point_id = i + 1  
+            point_ids.append(str(point_id))  
             
-            # Create a point with the embedding and metadata
             points.append(
                 PointStruct(
-                    id=point_id,  # Numeric ID
+                    id=point_id,
                     vector=embedding,
                     payload={
                         "text": chunk["text"],
@@ -121,7 +112,6 @@ class QdrantStorage:
                 )
             )
         
-        # Store points in batches
         batch_size = 100
         for i in range(0, len(points), batch_size):
             batch = points[i:i+batch_size]
@@ -149,7 +139,6 @@ class QdrantStorage:
         Returns:
             List of dictionaries containing search results with scores and payloads
         """
-        # Build search filter if needed
         search_filter = None
         if url_filter:
             search_filter = Filter(
@@ -161,7 +150,6 @@ class QdrantStorage:
                 ]
             )
         
-        # Perform the search using query_points (newer API)
         search_results = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_vector,
@@ -169,7 +157,6 @@ class QdrantStorage:
             query_filter=search_filter
         )
         
-        # Format results
         results = []
         for result in search_results:
             results.append({
@@ -195,7 +182,6 @@ class QdrantStorage:
             Number of points deleted
         """
         try:
-            # First count how many points match the filter
             count_result = self.client.count(
                 collection_name=self.collection_name,
                 count_filter=Filter(
@@ -209,7 +195,6 @@ class QdrantStorage:
             )
             points_to_delete = count_result.count
             
-            # Then delete them
             self.client.delete(
                 collection_name=self.collection_name,
                 points_selector=Filter(

@@ -58,7 +58,6 @@ class OpenAIEmbeddings(EmbeddingProvider):
         if not texts:
             return []
             
-        # Process in batches of 100 to avoid API limits
         batch_size = 100
         all_embeddings = []
         
@@ -102,8 +101,6 @@ class GeminiEmbeddings(EmbeddingProvider):
         """Generate embeddings using Gemini API."""
         if not texts:
             return []
-            
-        # Process in batches of 100 to avoid API limits
         batch_size = 100
         all_embeddings = []
         

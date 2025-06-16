@@ -20,7 +20,6 @@ app = FastAPI(
     description="API for scraping websites and building a searchable knowledge base"
 )
 
-# Initialize knowledge base
 kb = KnowledgeBase()
 
 def get_provider(source: str):
@@ -59,7 +58,6 @@ def process_website(payload: ProcessWebsiteRequest):
     Process a website by scraping, chunking, embedding, and storing in the vector database.
     """
     try:
-        # Validate chunking strategy before passing to knowledge base
         if payload.chunkingStrategy:
             valid_strategies = ['paragraph', 'sentence', 'token']
             if payload.chunkingStrategy.lower() not in valid_strategies:
@@ -73,10 +71,8 @@ def process_website(payload: ProcessWebsiteRequest):
         )
         return ProcessWebsiteResponse(status="success", data=result)
     except ValueError as e:
-        # Return 400 for invalid input parameters
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Log the error for debugging
         print(f"Error processing website: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
